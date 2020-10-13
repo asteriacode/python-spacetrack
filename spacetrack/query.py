@@ -1,4 +1,3 @@
-
 BASE_URL = "https://www.space-track.org"
 
 class Query:
