@@ -72,13 +72,17 @@ class Client:
         # Store the session cookie
         self.session.cookies = res.cookies
 
-    def dispatch_query(self, query):
+    def dispatch_query(self, query, do_retry=True):
         self.rl_request()
         res = self.session.get(query.to_url())
 
         if not res.ok:
-            # TODO: Reauth and try again
-            raise Exception("Dispatching query failed")
+            # Reauth and try again
+            if do_retry and res.status_code == 401:
+                self.attempt_auth(query)
+                self.dispatch_query(query, do_retry=False)
+            else:
+                raise Exception("Dispatching query failed")
 
         # TODO: Parse into class
         return res.json()
