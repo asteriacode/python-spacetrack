@@ -2,8 +2,16 @@ import requests
 from requests.utils import add_dict_to_cookiejar
 from spacetrack.query import Query, BASE_URL
 
+from time import sleep
+from datetime import datetime,timedelta
+
+MINUTE = timedelta(minutes=1)
+
+# Recommended by spacetrack.
+MAX_PER_MINUTE = 30
+
 class Client:
-    def __init__(self, username, password):
+    def __init__(self, username, password, immediate_auth=True, error_on_rate_limit=False):
         self.session = requests.Session()
         self.session.headers = {
             'User-Agent': "curl/7.72.0",
@@ -11,11 +19,48 @@ class Client:
         }
         self.username = username
         self.password = password
+        self.error_on_rate_limit = error_on_rate_limit
 
-        self.attempt_auth()
+        self.rl_start = datetime.now()
+        self.rl_count = 0
+
+        if immediate_auth:
+            self.attempt_auth()
+
+    # Wait/error to avoid rate limiting, if needed, otherwise record it.
+    # This should be called before making an API request
+    def rl_request(self):
+        # If more than a minute has passed since we started counting
+        elapsed = (datetime.now() - self.rl_start)
+        if elapsed.seconds / 60 > 0:
+            # Restart the counter
+            self.rl_start = datetime.now()
+            self.rl_count = 1
+
+            return True
+
+        if self.rl_count >= MAX_PER_MINUTE:
+            # We need to limit our rates
+            if self.error_on_rate_limit:
+                raise Exception("Rate limited (Client configured to error)")
+            else:
+                # Sleep until a minute has past from rl_start
+                period_left = MINUTE - elapsed
+                sleep(period_left.total_seconds())
+
+                # Restart the timer/count
+                self.rl_start = datetime.now()
+                self.rl_count = 1
+        else:
+            self.rl_count += 1
+
+        return True
+
+
 
     def attempt_auth(self):
         # Request a session cookie
+        self.rl_request()
         res = self.session.post(BASE_URL + '/ajaxauth/login', data={
             'identity': self.username,
             'password': self.password
@@ -28,7 +73,7 @@ class Client:
         self.session.cookies = res.cookies
 
     def dispatch_query(self, query):
-        # TODO: Rate limiting
+        self.rl_request()
         res = self.session.get(query.to_url())
 
         if not res.ok:
