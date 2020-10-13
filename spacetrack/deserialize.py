@@ -19,7 +19,7 @@ class FromDict:
                 if len(field) > 2:
                     map_function = field[2]
 
-            if key_name in obj.keys():
+            if key_name in obj.keys() and obj[key_name] != None:
                 self.__dict__[dst_name] = map_function(obj[key_name])
 
 def datetime(x):

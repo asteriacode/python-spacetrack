@@ -35,21 +35,38 @@ class Conjunction(FromDict):
         ("CREATION_DATE"),
         ("EMERGENCY_REPORTABLE", "is_emergency_reportable", lambda x: x == "Y"),
         ("TCA", "tca", datetime),
-        ("MIN_RNG", "min_rng", int),
+        ("MIN_RNG", "min_rng", float),
         ("PC", "pc", float),
         ("SAT_1_ID", "sat1_id", int),
         ("SAT_1_NAME", "sat1_name"),
         ("SAT1_OBJECT_TYPE", "sat1_type", ObjectType.from_string),
         ("SAT1_RCS", "sat1_rcs", ObjectSize.from_string),
-        ("SAT_1_EXCL_VOL", "sat1_excl_vol", float),
+        ("SAT_1_EXCL_VOL", "sat1_excl_vol"),
         ("SAT_2_ID", "sat1_id", int),
         ("SAT_2_NAME", "sat1_name"),
         ("SAT2_OBJECT_TYPE", "sat1_type", ObjectType.from_string),
         ("SAT2_RCS", "sat1_rcs", ObjectSize.from_string),
-        ("SAT_2_EXCL_VOL", "sat1_excl_vol", float)
+        ("SAT_2_EXCL_VOL", "sat1_excl_vol")
     ]
 
+class Decay(FromDict):
+    fields = [
+        ("NORAD_CAT_ID", "norad_cat_id", int),
+        ("OBJECT_NUMBER", "obj_number", int),
+        ("OBJECT_ID", "obj_id"),
+        ("OBJECT_NAME", "obj_name"),
+        ("INTLDES", "intldes"),
+        ("RCS", "rcs", int),
+        ("RCS_SIZE", "rcs_size", ObjectSize.from_string),
+        ("COUNTRY", "country"),
+        ("MSG_EPOCH", "msg_epoch", datetime),
+        ("DECAY_EPOCH", "decay_epoch"),
+        ("SOURCE", "source"),
+        ("MSG_TYPE", "msg_type"), # TODO
+        ("PRECEDENCE", "precedence")
+    ]
 
 OBJ_CLASS_TO_CLASS = {
-    'cdm_public': Conjunction
+    'cdm_public': Conjunction,
+    'decay': Decay
 }

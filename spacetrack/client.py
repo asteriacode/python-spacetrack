@@ -98,3 +98,10 @@ class Client:
             .order_by([("CREATION_DATE", "DESC")])
             .limit(10) # TODO 
             .column("SAT_1_NAME", name))
+
+    def latest_decay(self, name):
+        return self.dispatch_query(Query() \
+            .obj_class("decay")
+            .order_by([("PRECEDENCE", "ASC")])
+            .limit(1) # TODO 
+            .column("OBJECT_NAME", name))
