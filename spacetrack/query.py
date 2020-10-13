@@ -40,6 +40,7 @@ class Query:
         return self.__unique(column, ",".join(values))
 
     def obj_class(self, obj_class):
+        self.obj_class = obj_class
         return self.__unique("class", obj_class)
 
     def limit(self, n, skip=0):

@@ -1,9 +1,11 @@
-import requests
-from requests.utils import add_dict_to_cookiejar
-from spacetrack.query import Query, BASE_URL
-
 from time import sleep
 from datetime import datetime,timedelta
+
+import requests
+from requests.utils import add_dict_to_cookiejar
+
+from spacetrack.query import Query, BASE_URL
+from spacetrack.models import OBJ_CLASS_TO_CLASS
 
 MINUTE = timedelta(minutes=1)
 
@@ -84,5 +86,15 @@ class Client:
             else:
                 raise Exception("Dispatching query failed")
 
-        # TODO: Parse into class
-        return res.json()
+        content = res.json()
+        if query.obj_class in OBJ_CLASS_TO_CLASS:
+            content = list([OBJ_CLASS_TO_CLASS[query.obj_class](x) for x in content])
+
+        return content
+
+    def latest_cdms(self, name):
+        return self.dispatch_query(Query() \
+            .obj_class("cdm_public")
+            .order_by([("CREATION_DATE", "DESC")])
+            .limit(10) # TODO 
+            .column("SAT_1_NAME", name))
