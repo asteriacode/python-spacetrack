@@ -1,8 +1,7 @@
 from time import sleep
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 import requests
-from requests.utils import add_dict_to_cookiejar
 
 from spacetrack.query import Query, BASE_URL
 from spacetrack.models import OBJ_CLASS_TO_CLASS
@@ -11,6 +10,7 @@ MINUTE = timedelta(minutes=1)
 
 # Recommended by spacetrack.
 MAX_PER_MINUTE = 30
+
 
 class Client:
     def __init__(self, username, password, immediate_auth=True, error_on_rate_limit=False):
@@ -58,8 +58,6 @@ class Client:
 
         return True
 
-
-
     def attempt_auth(self):
         # Request a session cookie
         self.rl_request()
@@ -93,15 +91,15 @@ class Client:
         return content
 
     def latest_cdms(self, name):
-        return self.dispatch_query(Query() \
-            .obj_class("cdm_public")
-            .order_by([("CREATION_DATE", "DESC")])
-            .limit(10) # TODO 
-            .column("SAT_1_NAME", name))
+        return self.dispatch_query(Query()
+                                   .obj_class("cdm_public")
+                                   .order_by([("CREATION_DATE", "DESC")])
+                                   .limit(10)  # TODO
+                                   .column("SAT_1_NAME", name))
 
     def latest_decay(self, name):
-        return self.dispatch_query(Query() \
-            .obj_class("decay")
-            .order_by([("PRECEDENCE", "ASC")])
-            .limit(1) # TODO 
-            .column("OBJECT_NAME", name))
+        return self.dispatch_query(Query()
+                                   .obj_class("decay")
+                                   .order_by([("PRECEDENCE", "ASC")])
+                                   .limit(1)  # TODO
+                                   .column("OBJECT_NAME", name))

@@ -1,5 +1,6 @@
 BASE_URL = "https://www.space-track.org"
 
+
 class Query:
     def __init__(self, controller="basicspacedata", action="query"):
         self.controller = controller
@@ -10,7 +11,7 @@ class Query:
     # Unique predicates - Should only be used once and we raise an error if they're used twice
     def __unique(self, key, value):
         if key in self.used_predicates:
-            raise Error("Used %s predicate twice" % key)
+            raise Exception("Used %s predicate twice" % key)
 
         self.used_predicates += [key]
         self.fragments += [key, value]
@@ -27,7 +28,7 @@ class Query:
     # Columns is an array of tuples, ie [("name", "asc"), ("date", "desc")]
     def order_by(self, columns):
         if "orderby" in self.used_predicates:
-            raise Error("Used order_by predicate twice")
+            raise Exception("Used order_by predicate twice")
 
         self.used_predicates += ["order_by"]
 
@@ -45,7 +46,7 @@ class Query:
 
     def limit(self, n, skip=0):
         return self.__unique("limit", "%s,%s" % (n, skip))
-        
+
     def metadata(self):
         return self.__flag("metadata", "true")
 

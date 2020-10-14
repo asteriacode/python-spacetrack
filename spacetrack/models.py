@@ -1,6 +1,7 @@
 from spacetrack.deserialize import FromDict, datetime
 from enum import Enum
 
+
 class ObjectType(Enum):
     PAYLOAD = 1
     ROCKET_BODY = 2
@@ -17,6 +18,7 @@ class ObjectType(Enum):
             "OTHER": ObjectType.OTHER
         }[x]
 
+
 class ObjectSize(Enum):
     SMALL = 1
     MEDIUM = 2
@@ -28,6 +30,7 @@ class ObjectSize(Enum):
             "MEDIUM": ObjectSize.MEDIUM,
             "LARGE": ObjectSize.LARGE
         }[x]
+
 
 class Conjunction(FromDict):
     fields = [
@@ -49,6 +52,7 @@ class Conjunction(FromDict):
         ("SAT_2_EXCL_VOL", "sat1_excl_vol")
     ]
 
+
 class Decay(FromDict):
     fields = [
         ("NORAD_CAT_ID", "norad_cat_id", int),
@@ -62,9 +66,10 @@ class Decay(FromDict):
         ("MSG_EPOCH", "msg_epoch", datetime),
         ("DECAY_EPOCH", "decay_epoch"),
         ("SOURCE", "source"),
-        ("MSG_TYPE", "msg_type"), # TODO
+        ("MSG_TYPE", "msg_type"),  # TODO
         ("PRECEDENCE", "precedence")
     ]
+
 
 OBJ_CLASS_TO_CLASS = {
     'cdm_public': Conjunction,
