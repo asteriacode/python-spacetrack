@@ -29,3 +29,7 @@ class FromDict:
 
 def datetime(x):
     return p_datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%f")
+
+
+def boolean(x):
+    return x.lower() == "y"
