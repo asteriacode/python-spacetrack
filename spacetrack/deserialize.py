@@ -1,4 +1,5 @@
 from datetime import datetime as p_datetime
+from datetime import date as p_date
 
 
 class FromDict:
@@ -6,7 +7,7 @@ class FromDict:
         for field in self.fields:
             key_name = None
             dst_name = None
-            map_function = self.__identity
+            map_function = FromDict.__identity
             if isinstance(field, str):
                 key_name = field
                 dst_name = key_name
@@ -27,7 +28,15 @@ class FromDict:
         return x
 
 
+def date(x):
+    return p_date.fromisoformat(x)
+
+
 def datetime(x):
+    return p_datetime.strptime(x, "%Y-%m-%dT%H:%M:%S")
+
+
+def datetime_milli(x):
     return p_datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%f")
 
 

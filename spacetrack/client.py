@@ -15,10 +15,6 @@ MAX_PER_MINUTE = 30
 class Client:
     def __init__(self, username, password, immediate_auth=True, error_on_rate_limit=False):
         self.session = requests.Session()
-        self.session.headers = {
-            'User-Agent': "curl/7.72.0",
-            "Accept": "*/*"
-        }
         self.username = username
         self.password = password
         self.error_on_rate_limit = error_on_rate_limit
@@ -82,7 +78,7 @@ class Client:
                 self.attempt_auth(query)
                 self.dispatch_query(query, do_retry=False)
             else:
-                raise Exception("Dispatching query failed")
+                raise Exception("Dispatching query failed: %s" % res.status_code)
 
         content = res.json()
         if query.obj_class in OBJ_CLASS_TO_CLASS:
@@ -90,16 +86,48 @@ class Client:
 
         return content
 
-    def latest_cdms(self, name):
+    def latest_cdms(self, name, limit=10, skip=0):
+        """
+            Get the latest conjunction data for satellite name
+            Returns a (possibly empty) list of Conjunctions
+        """
         return self.dispatch_query(Query()
                                    .obj_class("cdm_public")
                                    .order_by([("CREATION_DATE", "DESC")])
-                                   .limit(10)  # TODO
+                                   .limit(limit, skip=skip)
                                    .column("SAT_1_NAME", name))
 
-    def latest_decay(self, name):
+    def latest_gps(self, name, limit=10, skip=0):
+        """
+            Return the latest general pertubation by object_name.
+            Returns a (possibly empty) list of Pertubations.
+        """
         return self.dispatch_query(Query()
-                                   .obj_class("decay")
-                                   .order_by([("PRECEDENCE", "ASC")])
-                                   .limit(1)  # TODO
+                                   .obj_class("gp")
+                                   .order_by([("CREATION_DATE", "DESC")])
+                                   .limit(limit, skip=skip)
                                    .column("OBJECT_NAME", name))
+
+    def latest_satcat(self, name):
+        """
+            Returns the current satcat by object_name.
+            Returns a Satellite object or None.
+        """
+        res = self.dispatch_query(Query()
+                                  .obj_class("satcat")
+                                  .limit(1)
+                                  .column("OBJECT_NAME", name)
+                                  .column("CURRENT", "Y"))
+        return res.pop() if len(res) > 0 else None
+
+    def latest_decay(self, name):
+        """
+            Get the latest decay data by object_name.
+            Returns a Decay object or None
+        """
+        res = self.dispatch_query(Query()
+                                  .obj_class("decay")
+                                  .order_by([("PRECEDENCE", "ASC")])
+                                  .limit(1)
+                                  .column("OBJECT_NAME", name))
+        return res.pop() if len(res) > 0 else None

@@ -1,4 +1,4 @@
-from spacetrack.deserialize import FromDict, datetime, boolean
+from spacetrack.deserialize import FromDict, datetime, datetime_milli, date, boolean
 from enum import Enum
 
 
@@ -35,9 +35,9 @@ class ObjectSize(Enum):
 class Conjunction(FromDict):
     fields = [
         ("CDM_ID", "cdm_id", int),
-        ("CREATION_DATE", "creation_date"),
+        ("CREATION_DATE", "creation_date", datetime),
         ("EMERGENCY_REPORTABLE", "emergency_reportable", boolean),
-        ("TCA", "tca", datetime),
+        ("TCA", "tca", datetime_milli),
         ("MIN_RNG", "min_rng", float),
         ("PC", "pc", float),
         ("SAT_1_ID", "sat_1_id", int),
@@ -83,15 +83,15 @@ class Pertubations(FromDict):
         ("REF_FRAME", "ref_frame"),
         ("TIME_SYSTEM", "time_system"),
         ("MEAN_ELEMENT_THEORY", "mean_element_theory"),
-        ("EPOCH", "epoch", datetime),
+        ("EPOCH", "epoch", datetime_milli),
         ("MEAN_MOTION", "mean_motion", float),
         ("ECCENTRICITY", "eccentricity", float),
         ("INCLINATION", "inclination", float),
         ("RA_OF_ASC_NODE", "ra_of_asc_node", float),
         ("ARG_OF_PERICENTER", "arg_of_pericenter", float),
         ("MEAN_ANOMALY", "mean_anomaly", float),
-        ("EPHEMERIS_TYPE", "ephemeris_type", int),  # TODO?
-        ("CLASSIFICATION_TYPE", "classification_type", int),  # TODO?
+        ("EPHEMERIS_TYPE", "ephemeris_type", int),
+        ("CLASSIFICATION_TYPE", "classification_type"),
         ("NORAD_CAT_ID", "norad_cat_id", int),
         ("ELEMENT_SET_NO", "element_set_no", int),
         ("REV_AT_EPOCH", "rev_at_epoch", int),
@@ -105,9 +105,9 @@ class Pertubations(FromDict):
         ("OBJECT_TYPE", "object_type", ObjectType.from_string),
         ("RCS_SIZE", "rcs_size", ObjectSize.from_string),
         ("COUNTRY_CODE", "country_code"),
-        ("LAUNCH_DATE", "launch_date", datetime),
+        ("LAUNCH_DATE", "launch_date", date),
         ("SITE", "site"),
-        ("DECAY_DATE", "decay_date", datetime),
+        ("DECAY_DATE", "decay_date", date),
         ("FILE", "file", int),
         ("GP_ID", "gp_id", int),
         ("TLE_LINE0", "tle_line0"),
@@ -123,9 +123,9 @@ class Satellite(FromDict):
         ("OBJECT_TYPE", "object_type", ObjectType.from_string),
         ("SATNAME", "satname"),
         ("COUNTRY", "country"),
-        ("LAUNCH", "launch", datetime),
+        ("LAUNCH", "launch", date),
         ("SITE", "site"),
-        ("DECAY", "decay", datetime),
+        ("DECAY", "decay", date),
         ("PERIOD", "period", float),
         ("INCLINATION", "inclination", float),
         ("APOGEE", "apogee", int),
@@ -141,25 +141,36 @@ class Satellite(FromDict):
         ("CURRENT", "current", boolean),
         ("OBJECT_NAME", "object_name"),
         ("OBJECT_ID", "object_id"),
-        ("OBJECT_NUMBER", "object_number", int),
+        ("OBJECT_NUMBER", "object_number", int)
     ]
+
+
+class Direction(Enum):
+    ASCENDING = 1
+    DESCENDING = 2
+
+    def from_string(x):
+        return {
+            "ASCENDING": ObjectSize.ASCENDING,
+            "DESCENDING": ObjectSize.DESCENDING
+        }[x]
 
 
 class TrackingInfo(FromDict):
     fields = [
-        ("NORAD_CAT_ID", "norad_cat_id", int)
-        ("MSG_EPOCH", "msg_epoch", datetime)
-        ("INSERT_EPOCH", "insert_epoch", datetime)
-        ("DECAY_EPOCH", "decay_epoch", datetime)
-        ("WINDOW", "window", int)
-        ("REV", "rev", int)
-        ("DIRECTION", "direction")  # TODO
-        ("LAT", "lat", float)
-        ("LON", "lon", float)
-        ("INCL", "incl", float)
-        ("NEXT_REPORT", "next_report", int)
-        ("ID", "id", int)
-        ("HIGH_INTEREST", "high_interest", boolean)
+        ("NORAD_CAT_ID", "norad_cat_id", int),
+        ("MSG_EPOCH", "msg_epoch", datetime),
+        ("INSERT_EPOCH", "insert_epoch", datetime),
+        ("DECAY_EPOCH", "decay_epoch", datetime),
+        ("WINDOW", "window", int),
+        ("REV", "rev", int),
+        ("DIRECTION", "direction", Direction.from_string),
+        ("LAT", "lat", float),
+        ("LON", "lon", float),
+        ("INCL", "incl", float),
+        ("NEXT_REPORT", "next_report", int),
+        ("ID", "id", int),
+        ("HIGH_INTEREST", "high_interest", boolean),
         ("OBJECT_NUMBER", "object_number", int)
     ]
 

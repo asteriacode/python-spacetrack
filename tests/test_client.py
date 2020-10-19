@@ -36,11 +36,3 @@ class QueryTests(unittest.TestCase):
             .limit(1)
 
         res = self.client.dispatch_query(q)
-
-    def test_latest_cdms(self):
-        out = self.client.latest_cdms("DELTA 1 DEB")
-        # TODO
-
-    def test_latest_decay(self):
-        out = self.client.latest_decay("DELTA 1 DEB")
-        # TODO
